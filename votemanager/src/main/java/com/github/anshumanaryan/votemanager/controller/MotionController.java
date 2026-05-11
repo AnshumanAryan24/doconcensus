@@ -1,7 +1,6 @@
 package com.github.anshumanaryan.votemanager.controller;
 
 import com.github.anshumanaryan.votemanager.model.Motion;
-import com.github.anshumanaryan.votemanager.repository.MotionRepository;
 import com.github.anshumanaryan.votemanager.service.MotionService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +17,15 @@ public class MotionController {
         DEFAULT_IN_FAVOUR(1),
         DEFAULT_AGAINST(0);
 
-        @Getter private final int voteCount;
+        @Getter
+        private final int voteCount;
+
         DefaultVotes(int voteCount) {
             this.voteCount = voteCount;
         }
-    };
+    }
+
+    ;
 
     private final MotionService motionService;
 

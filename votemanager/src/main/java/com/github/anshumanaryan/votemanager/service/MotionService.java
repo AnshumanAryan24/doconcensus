@@ -2,9 +2,9 @@ package com.github.anshumanaryan.votemanager.service;
 
 import com.github.anshumanaryan.votemanager.model.Motion;
 import com.github.anshumanaryan.votemanager.repository.MotionRepository;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
