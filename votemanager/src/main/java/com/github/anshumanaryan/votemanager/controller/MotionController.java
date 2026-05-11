@@ -1,5 +1,7 @@
 package com.github.anshumanaryan.votemanager.controller;
 
+import com.github.anshumanaryan.votemanager.dto.request.VoteRequest;
+import com.github.anshumanaryan.votemanager.dto.response.VoteResponse;
 import com.github.anshumanaryan.votemanager.model.Motion;
 import com.github.anshumanaryan.votemanager.service.MotionService;
 import lombok.Getter;
@@ -38,5 +40,13 @@ public class MotionController {
     @GetMapping("/motion")
     public Motion getMotionById(@RequestParam Integer id) {
         return motionService.getMotionByMotionId(id).orElse(null);
+    }
+
+    @PostMapping("/vote")
+    public @ResponseBody VoteResponse vote(@RequestBody VoteRequest voteRequest) {
+        boolean votedBefore = this.motionService.voteIfNotVotedBefore(
+                voteRequest.getMotionId(), voteRequest.getMemberId(), voteRequest.isVoteInFavour()
+        );
+        return new VoteResponse(voteRequest.getMotionId(), votedBefore);
     }
 }
