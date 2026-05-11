@@ -19,9 +19,7 @@ public class Motion {
         @Getter
         private final String value;
     }
-
-    ;
-
+    
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     @Setter

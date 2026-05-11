@@ -25,8 +25,6 @@ public class MotionController {
         }
     }
 
-    ;
-
     private final MotionService motionService;
 
     @PostMapping("/propose")
