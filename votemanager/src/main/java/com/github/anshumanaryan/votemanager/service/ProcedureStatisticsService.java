@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ProcedureStatisticsService {
-    CounterService counterService;
+    private final CounterService counterService;
 
     public void incrementSuccess() {
         this.counterService.incrementSuccessMotions();

@@ -5,7 +5,7 @@ WORKDIR /home/gradle/src
 RUN ./gradlew build --no-daemon -x test
 
 # Stage 2: Create the runtime image
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-alpine
 EXPOSE 8080
 RUN mkdir /app
 # Copy the built JAR from the first stage

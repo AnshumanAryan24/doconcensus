@@ -1,16 +1,21 @@
 package com.github.anshumanaryan.votemanager.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
-@RequiredArgsConstructor
 public class RedisCounterServiceImpl implements CounterService {
     private final StringRedisTemplate redisTemplate;
     private final String SUCCESS_MOTIONS_KEY = "counter:success";
     private final String FAILURE_MOTIONS_KEY = "counter:failure";
     private final String TOTAL_MOTIONS_KEY = "counter:total";
+
+    public RedisCounterServiceImpl(StringRedisTemplate stringRedisTemplate) {
+        this.redisTemplate = stringRedisTemplate;
+        this.registerKeys();
+    }
 
     @Override
     public void incrementSuccessMotions() {
@@ -26,16 +31,22 @@ public class RedisCounterServiceImpl implements CounterService {
 
     @Override
     public int getSuccess() {
-        return Integer.parseInt(this.redisTemplate.opsForValue().get(this.SUCCESS_MOTIONS_KEY));
+        return Integer.parseInt(Objects.requireNonNull(this.redisTemplate.opsForValue().get(this.SUCCESS_MOTIONS_KEY)));
     }
 
     @Override
     public int getFailure() {
-        return Integer.parseInt(this.redisTemplate.opsForValue().get(this.FAILURE_MOTIONS_KEY));
+        return Integer.parseInt(Objects.requireNonNull(this.redisTemplate.opsForValue().get(this.FAILURE_MOTIONS_KEY)));
     }
 
     @Override
     public int getTotal() {
-        return Integer.parseInt(this.redisTemplate.opsForValue().get(this.TOTAL_MOTIONS_KEY));
+        return Integer.parseInt(Objects.requireNonNull(this.redisTemplate.opsForValue().get(this.TOTAL_MOTIONS_KEY)));
+    }
+
+    public void registerKeys() {
+        this.redisTemplate.opsForValue().set(this.SUCCESS_MOTIONS_KEY, "0");
+        this.redisTemplate.opsForValue().set(this.FAILURE_MOTIONS_KEY, "0");
+        this.redisTemplate.opsForValue().set(this.TOTAL_MOTIONS_KEY, "0");
     }
 }

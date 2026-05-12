@@ -2,6 +2,7 @@ package com.github.anshumanaryan.votemanager.service.component;
 
 import com.github.anshumanaryan.votemanager.model.Motion;
 import com.github.anshumanaryan.votemanager.service.MotionService;
+import com.github.anshumanaryan.votemanager.service.ProcedureStatisticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +18,7 @@ public class VotingJudge {
 
     private final StringRedisTemplate redisTemplate;
     private final String TOTAL_MEMBERS_KEY = "totalMembers";
+    private final ProcedureStatisticsService procedureStatisticsService;
 
     @Scheduled(fixedRate = 5000)
     public void checkAndAttemptConclude() {
@@ -40,9 +42,11 @@ public class VotingJudge {
             int against = motion.getVotesAgainst();
 
             if (1.0f * inFavour / totalMembers >= this.SIMPLE_MAJORITY) {
-                this.motionService.closeVoting(motion, Motion.MotionStages.VOTED_SUCCESS);
+                this.motionService.closeVoting(motion.getMotionId(), Motion.MotionStages.VOTED_SUCCESS);
+                this.procedureStatisticsService.incrementSuccess();
             } else if (1.0f * against / totalMembers >= this.SIMPLE_MAJORITY) {
-                this.motionService.closeVoting(motion, Motion.MotionStages.VOTED_FAILED);
+                this.motionService.closeVoting(motion.getMotionId(), Motion.MotionStages.VOTED_FAILED);
+                this.procedureStatisticsService.incrementFailure();
             }
         }
     }

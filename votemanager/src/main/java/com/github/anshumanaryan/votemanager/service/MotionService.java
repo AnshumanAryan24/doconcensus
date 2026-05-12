@@ -27,6 +27,7 @@ public class MotionService {
         Motion gotMotion = this.motionRepository.save(motion);
         this.voteIdempotencyChecker = this.motionVotesRepository.save(new MotionVotes(gotMotion.getProposingMemberId()));
         this.voteIdempotencyChecker.addVotedMember(gotMotion.getProposingMemberId());
+        this.motionVotesRepository.save(this.voteIdempotencyChecker);
         return gotMotion;
     }
 
@@ -60,35 +61,36 @@ public class MotionService {
                 .orElseThrow(() -> new RuntimeException("Motion not found"));
 
         if (motionRepository.getLatestStage(motionId)
-                .equals(Motion.MotionStages.PROPOSED.getValue())) {
-            motionRepository.setStage(motionId, Motion.MotionStages.IN_VOTE.getValue());
+                .equals(Motion.MotionStages.PROPOSED)) {
+            motionRepository.setStage(motionId, Motion.MotionStages.IN_VOTE);
         }
         if (!votingOpen(motion)) {
             return true;
         }
 
         if (voteInFavour) {
-            motion.setVotesInFavour(motion.getVotesInFavour() + 1);
+            motionRepository.IncrementVotesInFavour(motionId);
         } else {
-            motion.setVotesAgainst(motion.getVotesAgainst() + 1);
+            motionRepository.IncrementVotesAgainst(motionId);
         }
 
         this.voteIdempotencyChecker.addVotedMember(memberId);
+        this.motionVotesRepository.save(this.voteIdempotencyChecker);
 
         return false;
     }
 
     @Transactional
-    public void closeVoting(Motion motion, Motion.MotionStages result) {
-        motion.setStage(result);
+    public void closeVoting(int motionId, Motion.MotionStages result) {
+        motionRepository.setStage(motionId, result);
     }
 
     private boolean votingOpen(Motion motion) {
         return motionRepository.getLatestStage(motion.getMotionId())
-                .equals(Motion.MotionStages.IN_VOTE.getValue());
+                .equals(Motion.MotionStages.IN_VOTE);
     }
 
     public List<Motion> getMotionsInVote() {
-        return this.motionRepository.findMotionsByStage(Motion.MotionStages.IN_VOTE.getValue());
+        return this.motionRepository.findMotionsByStage(Motion.MotionStages.IN_VOTE);
     }
 }
