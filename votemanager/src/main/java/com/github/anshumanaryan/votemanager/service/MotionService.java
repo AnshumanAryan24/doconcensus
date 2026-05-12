@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -58,6 +59,14 @@ public class MotionService {
         Motion motion = this.motionRepository.findById(motionId)
                 .orElseThrow(() -> new RuntimeException("Motion not found"));
 
+        if (motionRepository.getLatestStage(motionId)
+                .equals(Motion.MotionStages.PROPOSED.getValue())) {
+            motionRepository.setStage(motionId, Motion.MotionStages.IN_VOTE.getValue());
+        }
+        if (!votingOpen(motion)) {
+            return true;
+        }
+
         if (voteInFavour) {
             motion.setVotesInFavour(motion.getVotesInFavour() + 1);
         } else {
@@ -69,4 +78,17 @@ public class MotionService {
         return false;
     }
 
+    @Transactional
+    public void closeVoting(Motion motion, Motion.MotionStages result) {
+        motion.setStage(result);
+    }
+
+    private boolean votingOpen(Motion motion) {
+        return motionRepository.getLatestStage(motion.getMotionId())
+                .equals(Motion.MotionStages.IN_VOTE.getValue());
+    }
+
+    public List<Motion> getMotionsInVote() {
+        return this.motionRepository.findMotionsByStage(Motion.MotionStages.IN_VOTE.getValue());
+    }
 }

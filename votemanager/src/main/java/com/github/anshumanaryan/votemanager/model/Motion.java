@@ -8,6 +8,9 @@ import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
+@Table(name = "Motion", indexes = {
+        @Index(name = "idx_motion_stage", columnList = "stage")
+})
 public class Motion {
     @RequiredArgsConstructor
     public static enum MotionStages {
